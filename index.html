@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Accessible & Responsive Calculator</title>
+  <meta name="description" content="A user-friendly accessible calculator interface with a responsive image grid showcasing CSS filters, masks, shapes, sticky image, and flex/grid layouts.">
+
+  <style>
+  
+    :root{
+      --bg: #0860ee;
+      --card: #c33812;
+      --muted: #94a3b8;
+      --accent: #7c3aed; 
+      --accent-2: #06b6d4; 
+      --glass: rgba(255,255,255,0.04);
+
+      --gap: clamp(12px, 2vmin, 20px);
+      --radius: 14px;
+      --btn-size: clamp(44px, 6vmin, 64px);
+      --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+
+      --img-filter: saturate(1) contrast(1) brightness(1);
+    }
+    .page{
+      min-height: 100vh;
+      background: linear-gradient(180deg, rgba(12,14,23,1) 0%, rgba(11,15,25,1) 100%);
+      color: #e6eef8;
+      font-family: var(--font-sans);
+      padding: calc(var(--gap) * 1.2);
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 1fr min(950px, 1100px) 1fr;
+    }
+    .container{ grid-column: 2; display: grid; gap: var(--gap); }
+
+    header{
+      display: flex; align-items: center; justify-content: space-between; gap: var(--gap);
+    }
+    header h1{ font-size: clamp(18px, 2vw, 24px); margin:0 }
+    header p{ color:var(--muted); margin:0; font-size: clamp(12px, 1.2vw, 14px)}
+
+
+    .main-grid{
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: var(--gap);
+    }
+
+    @media (max-width: 900px){
+      .main-grid{ grid-template-columns: 1fr; }
+    }
+
+    .calc-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      padding: clamp(16px, 2.5vmin, 24px);
+      box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+      display: flex; flex-direction: column; gap: 12px;
+      min-height: 320px;
+    }
+
+
+    .display{
+      background: linear-gradient(90deg, rgba(243, 4, 4, 0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.03);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: clamp(20px, 3.4vmin, 28px);
+      min-height: 56px;
+      display:flex; align-items:center; justify-content: space-between;
+      gap: 12px;
+    }
+    .display .expr{ color: var(--muted); font-size: 0.9em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .display .result{ font-weight:700; font-variant-numeric: tabular-nums; }
+
+    .keypad{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+    button.key{
+      height: var(--btn-size);
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+      color: #e6eef8; font-size: clamp(16px, 2.2vmin, 20px);
+      cursor: pointer;
+      transition: transform .08s ease, box-shadow .12s ease, filter .12s;
+    }
+    button.key:active{ transform: translateY(1px); }
+
+  
+    button.op{ background: linear-gradient(180deg, rgba(124,58,237,0.18), rgba(124,58,237,0.12)); }
+    button.func{ background: linear-gradient(180deg, rgba(6,182,212,0.12), rgba(6,182,212,0.08)); }
+
+    
+    button.key:focus-visible{ outline: 3px solid rgba(124,58,237,0.3); outline-offset: 2px; }
+    .key-equals{ grid-column: span 2; background: linear-gradient(90deg,var(--accent),var(--accent-2)); font-weight:700; }
+
+    .row{ display:flex; gap:8px; align-items:center; justify-content:space-between }
+    .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden }
+
+  </style>
+</head>
+<body class="page">
+  <div class="container">
+    <main class="main-grid" id="main">
+
+      <section class="calc-card" aria-labelledby="calcTitle" role="region">
+
+        <div class="display" aria-live="polite">
+          <div class="expr" id="expression">0</div>
+          <div class="result" id="result">0</div>
+        </div>
+        <div
+          class="keypad"
+          role="application"
+          aria-label="Calculator keypad"
+          tabindex="0">
+          <button class="key" data-value="AC">AC</button>
+          <button class="key" data-value="+/-">+/-</button>
+          <button class="key" data-value="%">%</button>
+          <button class="key op" data-value="/" aria-label="divide">÷</button>
+          <button class="key" data-value="7">7</button>
+          <button class="key" data-value="8">8</button>
+          <button class="key" data-value="9">9</button>
+          <button class="key op" data-value="*" aria-label="multiply">
+            ×
+          </button>
+          <button class="key" data-value="4">4</button>
+          <button class="key" data-value="5">5</button>
+          <button class="key" data-value="6">6</button>
+          <button class="key op" data-value="-" aria-label="subtract">
+            −
+          </button>
+      
+           <button class="key" data-value="1">1</button>
+           <button class="key" data-value="2">2</button>
+           <button class="key" data-value="3">3</button>
+           <button class="key op" data-value="+" aria-label="subtract">
+             
+              +
+           </button>
+
+          <button class="key" data-value="0">0</button>
+          <button class="key" data-value=".">.</button>
+          <button class="key op" data-value="=" aria-label="add">=</button>
+          <button class="key" data-value="CE">CE</button>
+        </div>
+      </section>
+    </main>
+  <script>
+    (function(){
+      const exprEl = document.getElementById('expression');
+      const resEl = document.getElementById('result');
+      const keys = [...document.querySelectorAll('button.key')];
+      const clearBtn = document.getElementById('clear');
+      const delBtn = document.getElementById('del');
+      const equalsBtn = document.getElementById('equals');
+      const range = document.getElementById('themeRange');
+      const imgGrid = document.getElementById('imgGrid');
+
+      let expr = '';
+
+      function updateDisplay(){
+        exprEl.textContent = expr || '0';
+      }
+      function updateResult(val){ resEl.textContent = val }
+
+      function safeEval(s){
+
+        if(!/^[0-9+\-*/().\s]+$/.test(s)) return 'ERR';
+        try{
+        
+          const val = Function(`"use strict"; return (${s})`)();
+          if((typeof val)==='number' && isFinite(val)) return +parseFloat(val.toFixed(12));
+          return 'ERR';
+        } catch(e){ return 'ERR' }
+      }
+
+      keys.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const v = btn.dataset.value;
+          if(v === '=') return compute();
+          expr += v;
+          updateDisplay();
+        });
+      });
+
+      equalsBtn.addEventListener('click', compute);
+      clearBtn.addEventListener('click', ()=>{ expr = ''; updateDisplay(); updateResult('0'); });
+      delBtn.addEventListener('click', ()=>{ expr = expr.slice(0,-1); updateDisplay(); });
+
+      function compute(){
+        const out = safeEval(expr || '0');
+        updateResult(out);
+        if(out !== 'ERR') expr = String(out);
+        else expr = '';
+        updateDisplay();
+      }
+
+    
+      window.addEventListener('keydown', (e)=>{
+        
+        if(/^[0-9+\-*/().]$/.test(e.key)){
+          expr += e.key; updateDisplay();
+        } else if(e.key === 'Enter' || e.key === '='){ compute(); }
+        else if(e.key === 'Backspace'){ expr = expr.slice(0,-1); updateDisplay(); }
+        else if(e.key.toLowerCase() === 'c'){ expr = ''; updateDisplay(); updateResult('0'); }
+      });
+
+      document.body.addEventListener('mousedown', ()=> document.body.classList.add('using-mouse')); updateDisplay(); updateResult('0');
+    })();
+  </script>
+</body>
+</html>
